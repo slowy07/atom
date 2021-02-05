@@ -4,10 +4,7 @@ const crypto = require('crypto');
 const vm = require('vm');
 
 function computeHash(contents) {
-  return crypto
-    .createHash('sha1')
-    .update(contents, 'utf8')
-    .digest('hex');
+  return crypto.createHash('sha1').update(contents, 'utf8').digest('hex');
 }
 
 class NativeCompileCache {
@@ -42,7 +39,7 @@ class NativeCompileCache {
     const cachedData = script.createCachedData();
     return {
       result: script.runInThisContext(),
-      cacheBuffer: typeof cachedData !== 'undefined' ? cachedData : null
+      cacheBuffer: typeof cachedData !== 'undefined' ? cachedData : null,
     };
   }
 
@@ -50,7 +47,7 @@ class NativeCompileCache {
     const script = new vm.Script(code, { filename, cachedData });
     return {
       result: script.runInThisContext(),
-      wasRejected: script.cachedDataRejected
+      wasRejected: script.cachedDataRejected,
     };
   }
 
@@ -59,14 +56,14 @@ class NativeCompileCache {
     // Here we override Node's module.js
     // (https://github.com/atom/node/blob/atom/lib/module.js#L378), changing
     // only the bits that affect compilation in order to use the cached one.
-    Module.prototype._compile = function(content, filename) {
+    Module.prototype._compile = function (content, filename) {
       let moduleSelf = this;
       // remove shebang
       content = content.replace(/^#!.*/, '');
       function require(path) {
         return moduleSelf.require(path);
       }
-      require.resolve = function(request) {
+      require.resolve = function (request) {
         return Module._resolveFilename(request, moduleSelf);
       };
       require.main = process.mainModule;
@@ -115,7 +112,7 @@ class NativeCompileCache {
         dirname,
         process,
         global,
-        Buffer
+        Buffer,
       ];
       return compiledWrapper.apply(moduleSelf.exports, args);
     };

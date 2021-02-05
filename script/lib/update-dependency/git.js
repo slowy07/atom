@@ -18,10 +18,10 @@ const git = (git, repositoryRootPath) => {
     console.log(ex.message);
   }
   return {
-    switchToMaster: async function() {
+    switchToMaster: async function () {
       await git.checkout('origin/master');
     },
-    makeBranch: async function(dependency) {
+    makeBranch: async function (dependency) {
       const newBranch = `${dependency.moduleName}-${dependency.latest}`;
       const { branches } = await git.branch();
       const { files } = await git.status();
@@ -29,14 +29,14 @@ const git = (git, repositoryRootPath) => {
         await git.reset('hard');
       }
       const found = Object.keys(branches).find(
-        branch => branch.indexOf(newBranch) > -1
+        (branch) => branch.indexOf(newBranch) > -1
       );
       found
         ? await git.checkout(found)
         : await git.checkoutLocalBranch(newBranch);
       return { found, newBranch };
     },
-    createCommit: async function({ moduleName, latest }) {
+    createCommit: async function ({ moduleName, latest }) {
       try {
         const commitMessage = `:arrow_up: ${moduleName}@${latest}`;
         await git.add([packageJsonFilePath, packageLockFilePath]);
@@ -45,20 +45,20 @@ const git = (git, repositoryRootPath) => {
         throw Error(ex.message);
       }
     },
-    publishBranch: async function(branch) {
+    publishBranch: async function (branch) {
       try {
         await git.push('ATOM', branch);
       } catch (ex) {
         throw Error(ex.message);
       }
     },
-    deleteBranch: async function(branch) {
+    deleteBranch: async function (branch) {
       try {
         await git.deleteLocalBranch(branch, true);
       } catch (ex) {
         throw Error(ex.message);
       }
-    }
+    },
   };
 };
 module.exports = git;
